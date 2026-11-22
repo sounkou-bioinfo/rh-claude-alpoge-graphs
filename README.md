@@ -47,7 +47,7 @@ supply.
 Take a lemma that is uniform in the geometry parameter $\Gamma$ and
 whose conclusion $C$ does not mention $\Gamma$:
 
-$$L : \forall \Gamma : \mathrm{GeoP}, \quad H(\Gamma) \to \mathrm{GeoCl}\ \Gamma \to C$$
+$$L : \forall \Gamma : \mathrm{GeoP}, \quad H(\Gamma) \to \mathrm{GeoCl}(\Gamma) \to C$$
 
 Instantiate it at the constant predicate
 $\Gamma^{\top} := \lambda D J X. \top$, which is `anyGeometry`. The
@@ -150,28 +150,31 @@ Chebyshev function. With the von Mangoldt function $\Lambda$ and Euler’s
 constant $\gamma$, the source defines
 
 $$S(x) = \sum_{n \le x} \Lambda(n)\left(\frac{x}{n} - 1\right), \qquad
-G_z(x) = S(x) - x \log x + (1 + \gamma)\,x ,$$
+G_z(x) = S(x) - x \log x + (1 + \gamma) x$$
 
 and, for a level $\Lambda$ with characters $\psi$ and weights $w_\psi$,
-$G_m(x) = G_z(x) + \sum_{\psi} w_\psi \, \operatorname{Re} g_{\chi_\psi}(x)$,
+
+$$G_m(x) = G_z(x) + \sum_{\psi} w_\psi \mathrm{Re} \left( g_{\chi_\psi}(x) \right)$$
+
 where $g_\chi$ is the same construction twisted by $\chi$. A bound
 $G_m(x) \le x^{1/2+\varepsilon}$ for all small $\varepsilon$ is as
 strong as the Riemann Hypothesis for these characters. The proof makes
 three moves:
 
 $$\mathrm{TopG}
-\;\xrightarrow{\ \text{hosts at every scale}\ }\;
-\exists H.\ \mathrm{EAtH}(H, x) \wedge \mathrm{CoreAtH}(H, x)
-\;\xrightarrow{\ \texttt{core\_gm}\ }\;
-G_m(x) \le x^{\frac12 + (e_D + e_L + 7)\varepsilon}
-\;\xrightarrow{\ \texttt{formB}\ }\;
-L(s, \chi) \ne 0 \ \ (\operatorname{Re} s > \tfrac12)$$
+\quad \xrightarrow{\text{hosts at every scale}} \quad
+\exists H. \quad \mathrm{EAtH}(H, x) \wedge \mathrm{CoreAtH}(H, x)$$
+
+$$\xrightarrow{\text{core-gm}} \quad
+G_m(x) \le x^{\frac{1}{2} + (e_D + e_L + 7)\varepsilon}
+\quad \xrightarrow{\text{formB}} \quad
+L(s, \chi) \ne 0 \quad \text{for } \mathrm{Re}(s) > \frac{1}{2}$$
 
 - `formB` turns a growth bound for $G_m$ on windows into a zero-free
   half-plane.
-- `core_gm` (74 lines of source) derives the bound on $G_m(x)$ from a
-  *host* $H$ at scale $x$: the explicit-formula conditions `EAtH` and
-  the combinatorial size conditions `CoreAtH`.
+- `core_gm` (“core-gm” above, 74 lines of source) derives the bound on
+  $G_m(x)$ from a *host* $H$ at scale $x$: the explicit-formula
+  conditions `EAtH` and the combinatorial size conditions `CoreAtH`.
 - `TopG` states that for every small $\varepsilon$ there is a family of
   hosts satisfying these conditions at every large window scale.
   `zero_free_all_of_green_v_win` derives it from `Green`, `VWin` and the
