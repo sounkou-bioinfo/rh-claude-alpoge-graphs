@@ -1,0 +1,5 @@
+constant	used_by
+GlobalTheory.Mem.Top.Bl.GeoCl.rec	GlobalTheory.Mem.Top.Bl.GeoCl
+GlobalTheory.Mem.Top.Bl.OAt.geo	GlobalTheory.Mem.OxMove.oAt_setDiv
+GlobalTheory.Mem.Top.Bl.OAt.geo	GlobalTheory.Mem.Top.Closing.divEx_geoCl
+GlobalTheory.Mem.Top.Bl.OAt.rec	

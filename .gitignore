@@ -1,4 +1,5 @@
 .quarto/
-report/geometry-slot.typ
+README_files/
+README.typ
 *.duckdb
 out/

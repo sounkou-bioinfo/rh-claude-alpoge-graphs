@@ -1,0 +1,16 @@
+name	kind	depends_on_vacuous_witness
+GlobalTheory.Mem.Top.Bl.parametersOfDependence	def	true
+UpperTheory.Lit.nonempty_hyps_definite_side_of_closed_bound	thm	true
+GlobalTheory.CovTop.CovolumeBoundOfX	def	false
+GlobalTheory.Fc.S0.UnitaryGroupThirdPlaceHypotheses	inductive	false
+GlobalTheory.Fc.S0.UnitaryGroupThirdPlaceHypotheses.greenRegularCharacters	thm	false
+GlobalTheory.Fc.S0.UnitaryGroupThirdPlaceHypotheses.nLink	thm	false
+GlobalTheory.FunPr.ThetaLocalInputs	inductive	false
+GlobalTheory.GreenBridge.green_of_regular	thm	false
+GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching	def	false
+GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree	def	false
+UpperTheory.EveryCharacter	def	false
+UpperTheory.N.boundAtTwoThree_linked_of_recT	thm	false
+UpperTheory.Top.VWin	def	false
+UpperTheory.Top.every_character_of_green_v_win	thm	false
+UpperTheory.Zero.LLC.RecTExists	def	false

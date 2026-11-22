@@ -1,0 +1,11 @@
+name	depends_on_vacuous_witness
+UpperTheory.Lit.every_character_of_theta_integrals_local_matching	true
+UpperTheory.Lit.nonempty_hyps_definite_side_of_closed_bound	true
+Formalism.HC.zeroFreeOn_of_tiedWin_cyc	false
+Formalism.L2.DIV.Compl3	false
+Formalism.L2.DIV.DivInputsR	false
+Formalism.L2.DIV.WordFacts	false
+Formalism.L2.DIV.linkDIV_at_words	false
+Formalism.VW.rh_of_every	false
+UpperTheory.Top.every_character_of_green_v_win	false
+UpperTheory.Top.zero_free_all_of_green_v_win	false
