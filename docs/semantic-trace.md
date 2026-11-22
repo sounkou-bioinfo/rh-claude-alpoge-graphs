@@ -20,13 +20,14 @@ relative to `src/`.
 | 2 | `core_gm` | in full (74 lines) | unpacks `CoreAtH`, calls steps 3 and 4 | none |
 | 3 | `Deduction.ch_core` | theorem and `core` lemma; helpers skimmed (446 lines) | averaging over a subgroup by character orthogonality | none |
 | 4 | `Deduction.ch_top` | in full (76 lines) | bound on the prime-sum gap from an abstract record | none |
-| 5 | `each_unit_bound_statement`, `SizeData₂`, `ErrWindows` supply | **not read** | where the strength must enter | unknown |
+| 5 | `each_unit_bound_statement`, `SizeData₂`, `ErrWindows` supply | see [step 5](step5-record.md) | loss bound and gain bound from hypotheses on the family `FamP` | none found |
 | side | `QH.pairEx` host supply | statements and key lemmas | auxiliary primes from zero-density and mean-square bounds | none |
 
 Every step that was read is a valid reduction, and none of them contains
 a vacuous condition. Each one moves the hard estimate into a hypothesis.
 The strength of the Riemann Hypothesis has not yet been found as a
-proved statement. Step 5 is where it must enter.
+proved statement. [Step 5](step5-record.md) follows it into the
+hypotheses on the family `FamP`.
 
 ## Step 1. `formB`: bound on the host sums ⇒ zero-free
 
@@ -128,7 +129,10 @@ arithmetic and bound it:
 | `h2 : SizeData₂ …` | 11 inequalities on the record’s fields. `each_unit_bound_statement` turns them into $\mathrm{ASK} - \mathrm{Main} \le$ error |
 | `h3 : ErrWindows …` | makes the error small. The key clause is $(\bar\eta + 4\sqrt{\bar e})\, x^{c_{HH}} b \le K x^{\varepsilon} n_T a$ |
 
-## Step 5. Where the strength must enter: not read
+## Step 5. Where the strength must enter
+
+Continued in [`step5-record.md`](step5-record.md). The rest of this
+section records the question as it stood at `ch_top`.
 
 After step 4, the estimate with the strength of the Riemann Hypothesis
 has become this statement: the real prime sum `ASK`, identified with an

@@ -296,8 +296,14 @@ The endgame was then read in the source, step by step: [`docs/semantic-trace.md`
 `formB`, `core_gm`, `ch_core` and `ch_top` are valid reductions with no vacuous condition.
 Each one moves the hard estimate into a hypothesis. After `ch_top`, the estimate with the
 strength of the Riemann Hypothesis is a set of inequalities on an abstract record that
-`IdentU` identifies with a real prime sum. Where those inequalities are proved has not been
-read yet.
+`IdentU` identifies with a real prime sum. The next step,
+[`docs/step5-record.md`](docs/step5-record.md), shows that the identification is honest: the
+record's prime sum *is* the prime sum, by `rfl`. The inequalities split into a loss bound
+(the prime sum is at most a local gain plus a small term) and a gain bound (the local gain
+is at most the main term, through inequalities on lattice slopes and divisor degrees). Both
+are proved from hypotheses on a family of objects, `FamP`, that the supply of `TopG`
+builds. Those hypotheses have not been read yet. No vacuous condition was found on this
+path.
 
 ## Assessment
 
@@ -385,7 +391,7 @@ cd .. && quarto render README.qmd
 | `sql/` | Load script, the queries behind each result, and the export of `results/` |
 | `results/` | The result tables that this document reads |
 | `figures/` | The graph, generated when this document is rendered |
-| `docs/` | Longer documents linked from this README: `semantic-trace.qmd` reads the endgame in the source |
+| `docs/` | Longer documents linked from this README: `semantic-trace.qmd` reads the endgame in the source, `step5-record.qmd` continues it |
 
 Nielsen's paper is not redistributed. The export and the full graph tables (about 5 GB) are
 not included. They can be rebuilt with the commands above.
