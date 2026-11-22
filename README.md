@@ -172,9 +172,12 @@ L(s, \chi) \ne 0 \quad \text{for } \mathrm{Re}(s) > \frac{1}{2}$$
 
 - `formB` turns a growth bound for $G_m$ on windows into a zero-free
   half-plane.
-- `core_gm` (“core-gm” above, 74 lines of source) derives the bound on
-  $G_m(x)$ from a *host* $H$ at scale $x$: the explicit-formula
-  conditions `EAtH` and the combinatorial size conditions `CoreAtH`.
+- `core_gm` (“core-gm” above) derives the bound on $G_m(x)$ from a
+  *host* $H$ at scale $x$: the analytic conditions `EAtH` and the
+  conditions `CoreAtH`. Its source is 74 lines, but these lines only
+  unpack `CoreAtH` (about 40 components, one of them a window bundle of
+  28 fields) and pass them to `Deduction.ch_core` and
+  `Deduction.ch_top`, which do the estimate.
 - `TopG` states that for every small $\varepsilon$ there is a family of
   hosts satisfying these conditions at every large window scale.
   `zero_free_all_of_green_v_win` derives it from `Green`, `VWin` and the
@@ -200,12 +203,13 @@ in exactly one of the premise cones.
 | `formB` | bound on G_m =\> zero-free | 48 | 0.00% | 16 |
 
 The step from `TopG` to nonvanishing is small: 3,242 declarations, 0.04%
-of the proof term. It is the part a human can read in full. A census of
-the whole project finds 10 definitions whose body is the constant
-`True`. 0 of them are in this endgame and 9 are in the supply of
-`HypsAlt`. Their names show that they fill slots:
-`trivialClassCondition`, `trivialTieCondition`, `UnusedSlot72`,
-`NoCondition`, `UnusedSlot55`, `noCondition`.
+of the proof term. Small does not mean easy to read: it holds `ch_core`
+and `ch_top`, which have not been read for this report. A census of the
+whole project finds 10 definitions whose body is the constant `True`. 0
+of them are in this endgame and 9 are in the supply of `HypsAlt`. Their
+names show that they fill slots: `trivialClassCondition`,
+`trivialTieCondition`, `UnusedSlot72`, `NoCondition`, `UnusedSlot55`,
+`noCondition`.
 
 So the answer to check 4 is the following. The content is the supply of
 `TopG`: hosts with the conditions `EAtH` and `CoreAtH` at every large
@@ -221,8 +225,21 @@ nonvanishing does not depend on any `True` slot.
 A dependency graph cannot decide whether the supply of `TopG` is a
 mathematical argument that a person can follow, or whether a non-vacuous
 condition in it is false and still accepted. A false condition cannot be
-proved in a sound kernel. The definitions of `EAtH` and `CoreAtH`, about
-30 lines, are the place to start reading.
+proved in a sound kernel.
+
+The host supply was traced one level down. `QH.pairEx` builds each host
+from two auxiliary primes $q \equiv 3 \pmod 8$ and
+$d \equiv 7 \pmod{16}$. It chooses them so that the twists of the
+character by $(\cdot/q)$ and $(\cdot/q)(\cdot/d)$ have Chebyshev sums at
+most $y^{1/2+\tau}$ on a finite window, a bounded $L'/L(1)$, and no
+exceptional zero. The existence of such primes comes from a zero-density
+count near $\mathrm{Re}(s) = 1$ (`count_bad`) and a mean-square bound
+over quadratic twists (`meanSq_abs`). These are real conditions, and
+none of them is `True`. They control the twists only on average and on
+finite windows. The step that turns them into a bound on $G_m(x)$ at
+every large $x$, which is as strong as the Riemann Hypothesis, must
+therefore be in `ch_core` and `ch_top`. That is the place to read next,
+and this report has not read it.
 
 ## Assessment
 
