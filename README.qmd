@@ -292,16 +292,12 @@ A dependency graph cannot decide whether the supply of `TopG` is a mathematical 
 that a person can follow, or whether a non-vacuous condition in it is false and still
 accepted. A false condition cannot be proved in a sound kernel.
 
-The host supply was traced one level down. `QH.pairEx` builds each host from two auxiliary
-primes $q \equiv 3 \pmod 8$ and $d \equiv 7 \pmod{16}$. It chooses them so that the twists
-of the character by $(\cdot/q)$ and $(\cdot/q)(\cdot/d)$ have Chebyshev sums at most
-$y^{1/2+\tau}$ on a finite window, a bounded $L'/L(1)$, and no exceptional zero. The
-existence of such primes comes from a zero-density count near $\mathrm{Re}(s) = 1$
-(`count_bad`) and a mean-square bound over quadratic twists (`meanSq_abs`). These are real
-conditions, and none of them is `True`. They control the twists only on average and on
-finite windows. The step that turns them into a bound on $G_m(x)$ at every large $x$, which
-is as strong as the Riemann Hypothesis, must therefore be in `ch_core` and `ch_top`. That is
-the place to read next, and this report has not read it.
+The endgame was then read in the source, step by step: [`docs/semantic-trace.md`](docs/semantic-trace.md).
+`formB`, `core_gm`, `ch_core` and `ch_top` are valid reductions with no vacuous condition.
+Each one moves the hard estimate into a hypothesis. After `ch_top`, the estimate with the
+strength of the Riemann Hypothesis is a set of inequalities on an abstract record that
+`IdentU` identifies with a real prime sum. Where those inequalities are proved has not been
+read yet.
 
 ## Assessment
 
@@ -389,6 +385,7 @@ cd .. && quarto render README.qmd
 | `sql/` | Load script, the queries behind each result, and the export of `results/` |
 | `results/` | The result tables that this document reads |
 | `figures/` | The graph, generated when this document is rendered |
+| `docs/` | Longer documents linked from this README: `semantic-trace.qmd` reads the endgame in the source |
 
 Nielsen's paper is not redistributed. The export and the full graph tables (about 5 GB) are
 not included. They can be rebuilt with the commands above.
