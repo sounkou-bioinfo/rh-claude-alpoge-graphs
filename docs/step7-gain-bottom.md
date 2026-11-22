@@ -124,3 +124,5 @@ the Gram matrices `XE`, `Xc`) from the host and the family, and how
 their slopes relate to primes. On the gain side, this construction is
 where the link between geometry of numbers and the primes has to be
 made.
+
+Continued in [step 8](step8-loss-side.md), which follows the loss bound.

@@ -255,6 +255,15 @@ estimate is `slope_bounds`, a proved theorem in the geometry of numbers
 over number fields: 720 declarations and 0.05% of the proof, with no
 analysis and no vacuous dependency. The link to the primes must come
 from how the lattices are built from the arithmetic data, which has not
+been read. [`docs/step8-loss-side.md`](docs/step8-loss-side.md) follows
+the loss bound. The prime sum is rewritten as a sum of local terms over
+inert primes, and each local term is bounded by a local gain through an
+explicit per-prime inequality. Taken together, the two sides have the
+form of an Arakelov-type argument: the prime sum is at most the total
+local gain, and the total gain is bounded by the slope of a lattice
+built from local data. Both ends are proved statements with no vacuous
+dependency. The link between them, how the lattices are built from the
+local gains, is where a reader should judge the argument. It has not
 been read.
 
 ## Assessment
@@ -352,7 +361,7 @@ cd .. && quarto render README.qmd
 | `sql/` | Load script, the queries behind each result, and the export of `results/` |
 | `results/` | The result tables that this document reads |
 | `figures/` | The graph, generated when this document is rendered |
-| `docs/` | Longer documents linked from this README: `semantic-trace.qmd` reads the endgame in the source, `step5-record.qmd`, `step6-inputs-chain.qmd` and `step7-gain-bottom.qmd` continue it |
+| `docs/` | Longer documents linked from this README: `semantic-trace.qmd` reads the endgame in the source, `step5-record.qmd`, `step6-inputs-chain.qmd`, `step7-gain-bottom.qmd` and `step8-loss-side.qmd` continue it |
 
 Nielsen’s paper is not redistributed. The export and the full graph
 tables (about 5 GB) are not included. They can be rebuilt with the

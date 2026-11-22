@@ -117,3 +117,5 @@ $\sum_\rho p_j w_{j\rho} \log\Omega$ is the right one. Neither of these has been
 The next code to read is the construction of the lattices (`Nu`, `RR`, the Gram matrices
 `XE`, `Xc`) from the host and the family, and how their slopes relate to primes. On the gain side, this construction is where the link between geometry of numbers and the
 primes has to be made.
+
+Continued in [step 8](step8-loss-side.md), which follows the loss bound.
