@@ -130,3 +130,6 @@ over hundreds of thousands of theorems. The next query is: for the
 fields `L3main`, `twisted_third_sum_le` and `weight_height_sum_le`,
 which declarations construct the values that fill them, and what those
 declarations use from Mathlib.
+
+Continued in [step 7](step7-gain-bottom.md), which reaches the bottom of
+the gain bound.

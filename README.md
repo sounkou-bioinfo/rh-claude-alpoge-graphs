@@ -247,8 +247,15 @@ gain bound six levels further down. At each level the estimate is a
 field of an input structure that the level above passes in. Across the
 proof, only 3% of the 1,067,052 theorems use an analytic notion from
 Mathlib directly, and the largest theorems move structures between
-copies of the data. Where the inequalities are finally established is
-the construction of the top-level family, which has not been reached.
+copies of the data.
+[`docs/step7-gain-bottom.md`](docs/step7-gain-bottom.md) reaches the
+bottom of the gain bound. Its level-three term is *defined* equal to the
+main term (all seven fields of `ClosedScale3` hold by `rfl`). The real
+estimate is `slope_bounds`, a proved theorem in the geometry of numbers
+over number fields: 720 declarations and 0.05% of the proof, with no
+analysis and no vacuous dependency. The link to the primes must come
+from how the lattices are built from the arithmetic data, which has not
+been read.
 
 ## Assessment
 
@@ -345,7 +352,7 @@ cd .. && quarto render README.qmd
 | `sql/` | Load script, the queries behind each result, and the export of `results/` |
 | `results/` | The result tables that this document reads |
 | `figures/` | The graph, generated when this document is rendered |
-| `docs/` | Longer documents linked from this README: `semantic-trace.qmd` reads the endgame in the source, `step5-record.qmd` and `step6-inputs-chain.qmd` continue it |
+| `docs/` | Longer documents linked from this README: `semantic-trace.qmd` reads the endgame in the source, `step5-record.qmd`, `step6-inputs-chain.qmd` and `step7-gain-bottom.qmd` continue it |
 
 Nielsen’s paper is not redistributed. The export and the full graph
 tables (about 5 GB) are not included. They can be rebuilt with the
