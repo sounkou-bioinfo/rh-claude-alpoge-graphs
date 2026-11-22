@@ -1,0 +1,4 @@
+.quarto/
+report/geometry-slot.typ
+*.duckdb
+out/

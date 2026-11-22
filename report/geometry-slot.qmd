@@ -1,0 +1,185 @@
+---
+title: "Where does the trivial geometry certificate go?"
+subtitle: "A dependency walk of the compiled Riemann Hypothesis proof, in reply to the question in nomad421's note of 21 November 2026"
+date: 2026-11-22
+format:
+  typst:
+    papersize: a4
+    margin:
+      x: 2.1cm
+      y: 2.1cm
+    fontsize: 10pt
+    section-numbering: "1."
+    toc: false
+---
+
+## Summary
+
+nomad421's note "What follows from the dependency trace in the Riemann Hypothesis proof?"
+asks J. L. Nielsen to name the step where the formal proof needs a geometric fact and accepts
+the trivial certificate in its place. Nielsen's paper, *The Invalidity of Alpöge's Proposed
+Proof of the Riemann Hypothesis* (13 pages, PhilArchive NIEIOT-2), lists in §9 four checks that
+would confirm or refute her analysis. Her §10 says that she did not run a compiled dependency
+trace. This report runs that trace on the kernel export that the independent checkers accepted,
+and gives the result of each check.
+
+- **Nielsen's facts hold in the compiled term.** The four constants she names in check 2,
+  `anyGeometry`, `geoDegenerate`, `divXFl` and `x0`, are transitive dependencies of
+  `riemannHypothesis`.
+- **Nothing reads them.** No declaration in the export eliminates the geometry closure `GeoCl`.
+  The lemmas that extract a surface from the real geometry predicate are not in the export.
+  The two uses of the `geo` field put it into another certificate.
+- **The step that turns the bundle into nonvanishing does not depend on them.**
+  `zero_free_all_of_green_v_win` and `every_character_of_green_v_win` have no dependency on the
+  four constants. The constants reach the main theorem only through one lemma, which assembles
+  the hypothesis bundle and its parameters.
+
+So the geometric route that the names describe is not where the argument is. That is the first
+of the two cases in Nielsen's Appendix A, and on that point she is right. The compiled term does
+not support her conclusion that the proof is invalid or "does not exist". It contains a checked
+derivation whose content is in premises that do not touch the vacuous witnesses. That content
+has not been explained by anyone, and the graph shows where to look for it.
+
+## Sources
+
+| Artifact | Identity |
+|---|---|
+| Nielsen's paper | PhilArchive NIEIOT-2, 13 pages, PDF created 21 November 2026 16:50 CET |
+| Source | `leanprover-community/riemann-hypothesis` at `40e56bab`, the archive as published. 175,187 `.lean` files, Lean 4.33.1, Mathlib `0df444a3` |
+| Kernel export | Sutherland's `solution.ndjson.zst`, SHA-256 `61a8938a…05381`, the same as his `SHA256SUMS`. 61,570,595,788 bytes, 1,080,769,508 lines after decompression |
+| Checker status | Sutherland's page, read 22 November 2026 |
+
+## Method
+
+A C program (`tool/rhgraph.c`) reads the export as a stream and keeps the expression DAG
+in memory. There are 1,065,214,335 expression nodes. The program walks the type, value and
+recursor rules of every declaration that is reachable from the five theorems in `Main.lean`.
+It writes one edge for each constant that occurs in a declaration, and one record for each
+structure projection (`Expr.proj`).
+
+| Quantity | Value |
+|---|---|
+| Declaration records | 1,468,418. con-leche reports the same number accepted |
+| Kinds | 1,246,110 theorems · 214,241 definitions · 7,969 inductive blocks · 91 opaques · 4 `quot` · 3 axioms |
+| Reachable from the five theorems | 1,468,414. The other four are `Nat.lor`, `Nat.xor`, `String.mk`, `String.mk._proof_1` |
+| Direct dependency edges | 116,225,516 |
+| Projection uses | 88,149 |
+
+The edges were loaded into DuckDB. Each query below is a breadth-first search on the reversed
+edges ("which declarations depend on X") or a test for edges into a named constant. A
+reference to any name in an inductive block brings in the whole block. This makes the walk
+over-approximate, never under-approximate, the true dependencies.
+
+## The dependency graph
+
+![Every path from `riemannHypothesis` to the four vacuous witnesses (red), with the other
+premises of the lemma where the paths join. Orange: depends on a vacuous witness. Green: does
+not. An arrow points from a declaration to a constant that its term uses directly.](depgraph.svg){width=100%}
+
+| Vacuous witness | Namespace | Dependents | Distance from the main theorem |
+|---|---|---|---|
+| `anyGeometry` | `GlobalTheory.Mem.Top.Bl` | 31 | 8 |
+| `x0` | `GlobalTheory.Mem.Top.DivRec` | 52 | 16 |
+| `divXFl` | `Formalism.L2.Geo` | 28 | 20 |
+| `geoDegenerate` | `Formalism.L2.Geo` | 53 | 21 |
+| union of the four | | 85 | |
+
+Only 85 of 1,468,414 declarations depend on any of the four. All of these dependency paths go
+through `UpperTheory.Lit.every_character_of_theta_integrals_local_matching`. When it is removed
+from the graph, none of the four can be reached from the main theorem. The paths enter that
+lemma through two premises:
+
+- `nonempty_hyps_definite_side_of_closed_bound`, which proves that the hypothesis bundle
+  `HypsAlt` is nonempty, and
+- `parametersOfDependence`, a definition that fills the geometry parameter with `anyGeometry`.
+
+The other premises of the lemma do not depend on any of the four. These are
+`every_character_of_green_v_win`, `green_of_regular`, `VWin`, `ThetaIntegralsAgree`,
+`RecTExists` and `boundAtTwoThree_linked_of_recT`. The lemma that concludes nonvanishing from
+the bundle, `zero_free_all_of_green_v_win`, also has no such dependency. Neither do
+`zeroFreeOn_of_tiedWin_cyc`, `rh_of_every`, `linkDIV_at_words`, `Compl3`, `WordFacts` or
+`DivInputsR`.
+
+## Is the content of a certificate ever read?
+
+| Test over the whole export | Result |
+|---|---|
+| Users of `GeoCl.rec` (elimination of the closure) | none outside the `GeoCl` block |
+| Users of `OAt.rec` | none |
+| `Expr.proj` on the structure `OAt` | only the projection functions `OAt.geo`, `OAt.lam` |
+| Users of `OAt.geo` | `oAt_setDiv` (gives it to `GeoCl.step`) and `divEx_geoCl` (gives it to `geoCl_of`) |
+| `geoOf`, `geoOf_surf`, `oAt_geoOf` | not in the export |
+| `FrobeniusOrbitPlaceCount` | not in the export |
+| `True.rec`, `False.elim` and similar in the 85 dependent declarations | none |
+
+A proof that is used only to build another proof of the same kind carries no information to
+the conclusion. Every lemma on the path is uniform in the geometry parameter, so it proves the
+same thing when the parameter is `True`.
+
+## Nielsen's four checks
+
+1. **Independent kernel replay.** nanoda accepts the full export (exit 0). con-leche
+   master accepts all 1,468,418 declarations, and in comparison mode justifies all five
+   statements against the Mathlib-only challenge. lean4lean accepts all 175,187 modules. The
+   `lake comparator` run under Lean 4.36.0 has passed the statement comparison and the axiom
+   check, and its Lean kernel stages are still running. Nielsen is concerned about Lean 4.33.1
+   because of the runtime fixes in 4.34.1. nanoda and con-leche check the exported term without
+   any code that Lean 4.33.1 compiled. *Case 2 of her Appendix A ("an artifact") would need
+   these independent kernels to be unsound in the same way.*
+2. **Dependency walk.** All four constants are in the closure (table above). *This
+   confirms her finding at the level of the compiled term.*
+3. **The degree equation.** `FrobeniusOrbitPlaceCount` is not in the export. The compiled
+   proof does not use the statement that would make `dFl` vanish. *The concern does not
+   arise.*
+4. **The remaining hypotheses.** The vacuous witnesses inhabit the bundle `HypsAlt`, and the
+   consumer never reads its geometry. So the content must be in the premises that do not
+   depend on the witnesses, and in the fields of the bundle that are not about geometry. The
+   graph names those premises (green in the figure). *This report does not find out what is
+   in them, so this check is still open.*
+
+## Assessment
+
+**Nielsen is right that** the geometry predicate is `True`, that the certificate is in
+the dependency closure, that the lemmas written to extract geometric content are never used,
+and that the height equation holds by `rfl`. The route through geometry and lattice
+identification is not the argument that derives the theorem. The source presents that route
+by its names, so a reader who follows the names will be misled.
+
+**nomad421 is right that** no step uses the trivial certificate as evidence for a geometric
+object. The compiled term confirms this for all 1,468,414 declarations. The rewrite at
+`RecBridge.lean:338` and the bound `h5 : Compl3 …` are in the part of the graph that does not
+depend on the vacuous witnesses.
+
+**On validity.** In her Appendix A, Nielsen accepts that a term which typechecks is a
+derivation of Mathlib's `RiemannHypothesis`. The walk shows that this derivation does not get
+its conclusion from the vacuous witnesses. It gets the conclusion from premises that do not
+touch them. A geometric route that is presented but not used does not make the derivation
+invalid. It means that the mathematical argument has not been written down. That is a real
+gap in the exposition, and it should be closed before anyone accepts the result as
+understood. It is not a gap in the proof that was checked.
+
+## Limits
+
+- No kernel was run for this report. The acceptance of the export comes from Sutherland's
+  runs, and the Comparator kernel stages under Lean 4.36.0 were not complete at the time of
+  reading.
+- The graph shows which constants a term contains. It does not show how a term uses them.
+  A dependency can be on the path and still carry no information. The "never read" findings
+  come from the absence of eliminations and projections. They do not come from an analysis
+  of each term.
+- The green premises do not depend on the four witnesses that Nielsen names. They can contain
+  other vacuous definitions. That is the open part of her check 4.
+- The claims in Nielsen's §§3–5, about the degenerate model, the lattice witness and the
+  two geometries, were not rechecked field by field. The constants they concern are present,
+  and the graph shows which declarations reach them.
+
+## Reproduction
+
+```sh
+curl -LO https://math.mit.edu/~drew/grh/solution.ndjson.zst      # 7.7 GB
+gcc -O2 -o rhgraph tool/rhgraph.c
+zstd -dc --long=31 solution.ndjson.zst | ./rhgraph out riemannHypothesis \
+  riemannZeta_eq_zero_re LFunction_ne_zero_of_half_lt_re \
+  LFunction_eq_zero_re LFunction_eq_zero_re_of_isPrimitive       # about 10 min, 60 GB RAM
+# load out/{names,closure,edges,projs}.tsv into DuckDB; tool/anc.sh computes dependents
+```

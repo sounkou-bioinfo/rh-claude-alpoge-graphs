@@ -1,0 +1,12 @@
+lines	1080769508
+exprs	1065214335
+decl_blocks	1468418
+closure_blocks	1468414
+edges	116225516
+proj_uses	88149
+blocks_axiom	3
+blocks_def	214241
+blocks_thm	1246110
+blocks_opaque	91
+blocks_quot	4
+blocks_inductive	7969

@@ -1,0 +1,5 @@
+name	kind
+Nat.lor	def
+Nat.xor	def
+String.mk	def
+String.mk._proof_1	thm
