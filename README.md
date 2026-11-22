@@ -209,10 +209,11 @@ So the answer to check 4 is the following. The content is the supply of
 scale, for every small $\varepsilon$. That statement is as strong as the
 Riemann Hypothesis, and its supply is most of the proof. The supply of
 the bundle `HypsAlt` is where Nielsen’s vacuous witnesses are, together
-with most of the `True` slots. They fill fields of the bundle that, as
-shown above, nothing reads. The other fields carry the conditions that
-`core_gm` uses. The analytic deduction from `TopG` to nonvanishing does
-not depend on any `True` slot.
+with most of the `True` slots. A field of type `True` carries no
+information, and for the geometry fields the tests above show that
+nothing reads them. Which of the other fields supply the conditions that
+`core_gm` uses is not traced here. The analytic deduction from `TopG` to
+nonvanishing does not depend on any `True` slot.
 
 A dependency graph cannot decide whether the supply of `TopG` is a
 mathematical argument that a person can follow, or whether a non-vacuous
