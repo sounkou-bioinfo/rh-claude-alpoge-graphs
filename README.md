@@ -4,10 +4,11 @@
 
 This is an agent exploration. The investigation, the tools and this text
 were made in the [Pi coding agent](https://github.com/earendil-works/pi)
-with Fable 5.2 and Claude Opus 5.5, directed by
+with Claude Fable 5.2 and Claude Opus 5.5, directed by
 [sounkou-bioinfo](https://github.com/sounkou-bioinfo). The proof under
-study is reported to be generated with Claude, and one of the analysing
-models is Claude. Read the conclusions with that conflict in mind and
+study is reported to be generated with a Claude model, presumably Claude
+Fable 5.5, so the analysing models and the generating model come from
+the same family. Read the conclusions with that conflict in mind and
 check them against the data in `results/` and the tools in `tool/`.
 
 ## The question
@@ -34,8 +35,12 @@ that the independent checkers accepted.
 **In short:** the vacuous witnesses are in the compiled proof, as
 Nielsen says. Nothing reads them, as nomad421 says. They reach the main
 theorem through one lemma, by the premises that assemble the hypothesis
-bundle. The step that derives nonvanishing does not depend on them. What
-the rest of the proof contains is the open question.
+bundle. The step that derives nonvanishing does not depend on them. The
+step from host data to the Riemann Hypothesis is short and explicit. The
+hard content is in the supply of one existence statement, `TopG`: the
+bundle `HypsAlt` (60% of the proof term), the window statement `VWin`
+and the shape lemma. The vacuous witnesses are filler inside the bundle
+supply.
 
 ## Why a vacuous witness can be harmless
 
@@ -134,10 +139,86 @@ analysis.
     confirms her finding in the compiled term.*
 3.  **The degree equation.** `FrobeniusOrbitPlaceCount` is not in the
     export. *The concern does not arise.*
-4.  **The remaining hypotheses.** The content of the proof must be in
-    the premises that do not depend on the witnesses (green in the
-    figure). *What they contain is not examined here. This check is
-    open.*
+4.  **The remaining hypotheses.** See the next section. *The content is
+    located and measured. It is in the derivation of one existence
+    statement, `TopG`. Its mathematical meaning is not explained here.*
+
+## Check 4: where the content is
+
+The compiled proof reaches the Riemann Hypothesis through a weighted
+Chebyshev function. With the von Mangoldt function $\Lambda$ and Euler’s
+constant $\gamma$, the source defines
+
+$$S(x) = \sum_{n \le x} \Lambda(n)\left(\frac{x}{n} - 1\right), \qquad
+G_z(x) = S(x) - x \log x + (1 + \gamma)\,x ,$$
+
+and, for a level $\Lambda$ with characters $\psi$ and weights $w_\psi$,
+$G_m(x) = G_z(x) + \sum_{\psi} w_\psi \, \operatorname{Re} g_{\chi_\psi}(x)$,
+where $g_\chi$ is the same construction twisted by $\chi$. A bound
+$G_m(x) \le x^{1/2+\varepsilon}$ for all small $\varepsilon$ is as
+strong as the Riemann Hypothesis for these characters. The proof makes
+three moves:
+
+$$\mathrm{TopG}
+\;\xrightarrow{\ \text{hosts at every scale}\ }\;
+\exists H.\ \mathrm{EAtH}(H, x) \wedge \mathrm{CoreAtH}(H, x)
+\;\xrightarrow{\ \texttt{core\_gm}\ }\;
+G_m(x) \le x^{\frac12 + (e_D + e_L + 7)\varepsilon}
+\;\xrightarrow{\ \texttt{formB}\ }\;
+L(s, \chi) \ne 0 \ \ (\operatorname{Re} s > \tfrac12)$$
+
+- `formB` turns a growth bound for $G_m$ on windows into a zero-free
+  half-plane.
+- `core_gm` (74 lines of source) derives the bound on $G_m(x)$ from a
+  *host* $H$ at scale $x$: the explicit-formula conditions `EAtH` and
+  the combinatorial size conditions `CoreAtH`.
+- `TopG` states that for every small $\varepsilon$ there is a family of
+  hosts satisfying these conditions at every large window scale.
+  `zero_free_all_of_green_v_win` derives it from `Green`, `VWin` and the
+  bundle `HypsAlt`, through `shape_closed_link_n_of_green`.
+
+The size of each premise’s dependency cone, counting only the project’s
+own declarations, shows where the work is. The cones overlap, so the
+shares do not add up to 100%. “Exclusive” counts declarations that are
+in exactly one of the premise cones.
+
+| Cone | Role | Declarations | Share of proof term | Exclusive declarations |
+|:---|:---|:---|:---|:---|
+| `riemannHypothesis` | whole proof | 1,249,283 | 100.00% |  |
+| `nonempty_hyps_definite_side_of_closed_bound` | supply of the bundle HypsAlt | 738,570 | 59.59% | 496,874 |
+| `vwin_of_row` | window supply (VWin) | 273,221 | 20.16% | 186,480 |
+| `topCovolSlim2_use_alt_alt` | covolume bound | 237,951 | 18.78% | 112,402 |
+| `shape_closed_link_n_of_green` | Green =\> TopG shape | 89,899 | 4.41% | 19,749 |
+| `tLiftK` | theta lift (Row0b) | 42,444 | 2.85% | 13,662 |
+| `recTExists` | local Langlands parameters | 20,742 | 1.09% | 0 |
+| `zeroFreeAll_of_topG` | TopG =\> zero-free (whole endgame) | 3,242 | 0.04% |  |
+| `level_gm_le_on_family_scales` | hosts =\> bound on G_m (core_gm) | 3,091 | 0.04% | 316 |
+| `green_of_regular` | Green | 88 | 0.00% | 0 |
+| `formB` | bound on G_m =\> zero-free | 48 | 0.00% | 16 |
+
+The step from `TopG` to nonvanishing is small: 3,242 declarations, 0.04%
+of the proof term. It is the part a human can read in full. A census of
+the whole project finds 10 definitions whose body is the constant
+`True`. 0 of them are in this endgame and 9 are in the supply of
+`HypsAlt`. Their names show that they fill slots:
+`trivialClassCondition`, `trivialTieCondition`, `UnusedSlot72`,
+`NoCondition`, `UnusedSlot55`, `noCondition`.
+
+So the answer to check 4 is the following. The content is the supply of
+`TopG`: hosts with the conditions `EAtH` and `CoreAtH` at every large
+scale, for every small $\varepsilon$. That statement is as strong as the
+Riemann Hypothesis, and its supply is most of the proof. The supply of
+the bundle `HypsAlt` is where Nielsen’s vacuous witnesses are, together
+with most of the `True` slots. They fill fields of the bundle that, as
+shown above, nothing reads. The other fields carry the conditions that
+`core_gm` uses. The analytic deduction from `TopG` to nonvanishing does
+not depend on any `True` slot.
+
+A dependency graph cannot decide whether the supply of `TopG` is a
+mathematical argument that a person can follow, or whether a non-vacuous
+condition in it is false and still accepted. A false condition cannot be
+proved in a sound kernel. The definitions of `EAtH` and `CoreAtH`, about
+30 lines, are the place to start reading.
 
 ## Assessment
 
@@ -157,9 +238,9 @@ was checked does not get its conclusion from the witnesses. If the proof
 is wrong, the fault is in kernel soundness, in the meaning of the
 statement (Mathlib’s `riemannZeta` and `RiemannHypothesis` at the pinned
 version, and the challenge comparison), or in the identity of the
-checked artifact. Nielsen’s argument addresses none of these. What the
-green premises contain, and whether it is the mathematics that a proof
-of the Riemann Hypothesis needs, has not been explained by anyone.
+checked artifact. Nielsen’s argument addresses none of these. The
+derivation of `TopG` holds the content, and nobody has yet explained it
+as mathematics.
 
 ## Limits
 
@@ -168,8 +249,12 @@ of the Riemann Hypothesis needs, has not been explained by anyone.
 - The graph records which constants a term contains, not how the term
   uses them. “Never read” rests on the absence of eliminations and
   projections.
-- The green premises do not depend on the four witnesses that Nielsen
-  names. They can contain other vacuous definitions.
+- The census of vacuous definitions finds only definitions whose body is
+  the constant `True`. Other forms of vacuity, such as degenerate data
+  or conditions that hold for trivial reasons, are not detected.
+- The size of a proof term measures work done by the machine, not
+  mathematical depth. Generated proofs can be large for reasons
+  unrelated to difficulty.
 - A reference to any name in an inductive block brings in the whole
   block, so the graph over-approximates the dependencies.
 
@@ -216,6 +301,8 @@ duckdb graph.duckdb < ../sql/load.sql
 ../tool/anc.sh graph.duckdb anc_x0     GlobalTheory.Mem.Top.DivRec.x0
 duckdb graph.duckdb < ../sql/queries.sql
 sed "s#RESULTS#$PWD/../results#g" ../sql/export_results.sql | duckdb graph.duckdb
+# forward cones for check 4: run tool/desc.sh for each cone listed in sql/content.sql
+sed "s#RESULTS#$PWD/../results#g" ../sql/content.sql | duckdb graph.duckdb
 cd .. && quarto render README.qmd
 ```
 
@@ -224,6 +311,7 @@ cd .. && quarto render README.qmd
 | `README.qmd` | This document. It renders `README.md` and `rh-claude-alpoge-graphs.pdf` |
 | `tool/rhgraph.c` | Export reader and graph builder |
 | `tool/anc.sh` | Dependents of one declaration, in DuckDB |
+| `tool/desc.sh` | Forward dependency cone of one declaration, in DuckDB |
 | `sql/` | Load script, the queries behind each result, and the export of `results/` |
 | `results/` | The result tables that this document reads |
 | `figures/` | The graph, generated when this document is rendered |

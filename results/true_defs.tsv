@@ -1,0 +1,11 @@
+name	in_zeroFreeAll_of_topG	in_shape_of_green	in_hyps_bundle	in_vwin_of_row
+Formalism.L2.Pj.trivialClassCondition	false	false	true	false
+Formalism.L2.PjFree.trivialClassCondition	false	false	true	false
+GlobalTheory.BigTop.Fun.trivialTieCondition	false	false	true	false
+GlobalTheory.IndefiniteRowSideFullHecke.UnusedSlot39.trivialClassCondition	false	false	true	false
+GlobalTheory.Mem.Top.Bl.anyGeometry	false	false	true	false
+GlobalTheory.Published.UnusedSlot72	false	false	true	false
+UpperTheory.GalS.NoCondition	false	false	true	false
+UpperTheory.GalS.UnusedSlot55	false	false	true	false
+UpperTheory.One.M.TrivialCondition	false	false	true	false
+UpperTheory.V.U3.GCond.noCondition	false	false	false	true

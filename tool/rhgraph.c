@@ -9,6 +9,11 @@
  *   edges.tsv    decl_name_id, dep_name_id    (constants occurring directly in
  *                                               the type/value/rules of decl)
  *   projs.tsv    decl_name_id, struct_name_id, field_idx
+ *   sizes.tsv    decl_name_id, type_nodes, value_nodes, type_ends_in_prop,
+ *                type_head_name_id, value_head_name_id, value_head_args
+ *                (heads are taken after stripping binders and mdata; 0 when
+ *                the head is not a constant; inductive blocks get one row
+ *                with value fields 0)
  *   stats.txt    counts
  *
  * The closure walks from the ROOT declarations through constant references. Referencing any
@@ -25,7 +30,7 @@
 
 #define MAXE (1ULL << 31)
 
-enum { K_NONE, K_LEAF, K_APP, K_BIND, K_LET, K_CONST, K_PROJ, K_MDATA };
+enum { K_NONE, K_LEAF, K_APP, K_BIND, K_LET, K_CONST, K_PROJ, K_MDATA, K_LAM, K_PROP };
 
 static uint8_t *ekind;
 static uint32_t *ec0, *ec1;
@@ -174,7 +179,7 @@ static void parse_line(char *s)
         if (!q) return;
         q += 2;
         if (!strncmp(q, "lam\"", 4)) {
-            set_expr(id, K_BIND, (uint32_t)num_after(q, "\"type\":"), (uint32_t)num_after(q, "\"body\":"));
+            set_expr(id, K_LAM, (uint32_t)num_after(q, "\"type\":"), (uint32_t)num_after(q, "\"body\":"));
         } else if (!strncmp(q, "letE\"", 5)) {
             set_expr(id, K_LET, (uint32_t)num_after(q, "\"type\":"), (uint32_t)num_after(q, "\"body\":"));
             if (let_id.n && let_id.v[let_id.n - 1] >= id) { fprintf(stderr, "letE ids not increasing\n"); exit(4); }
@@ -189,8 +194,10 @@ static void parse_line(char *s)
             for (t = strstr(q, "\"expr\":"); t; t = strstr(t + 7, "\"expr\":")) p = t;
             if (!p) { fprintf(stderr, "mdata without expr: %.200s\n", s); exit(2); }
             set_expr(id, K_MDATA, (uint32_t)strtoull(p + 7, NULL, 10), 0);
+        } else if (!strncmp(q, "sort\":0}", 8)) {
+            set_expr(id, K_PROP, 0, 0);
         } else {
-            set_expr(id, K_LEAF, 0, 0);     /* natVal, sort, strVal */
+            set_expr(id, K_LEAF, 0, 0);     /* natVal, other sorts, strVal */
         }
     } else if (IS("app\":")) {
         set_expr(num_after(s, "\"ie\":"), K_APP, (uint32_t)num_after(s, "\"fn\":"), (uint32_t)num_after(s, "\"arg\":"));
@@ -250,6 +257,31 @@ static void fullname(uint32_t id, char *buf, size_t cap)
 /* epoch-stamped DAG walk collecting const names and projections */
 static uint32_t *seen, epoch;
 static vec32 stack;
+static uint64_t walked;                 /* new nodes visited by walk() */
+
+/* Strip leading binders (lam if lam_ok, pi if pi_ok) and mdata. */
+static uint32_t strip(uint32_t e, int lam_ok, int pi_ok)
+{
+    for (;;) {
+        if (ekind[e] == K_MDATA) e = ec0[e];
+        else if (lam_ok && ekind[e] == K_LAM) e = ec1[e];
+        else if (pi_ok && ekind[e] == K_BIND) e = ec1[e];
+        else return e;
+    }
+}
+
+/* Head constant of an application spine; 0 when it is not a constant. */
+static uint32_t head_const(uint32_t e, uint32_t *nargs)
+{
+    uint32_t n = 0;
+    for (;;) {
+        if (ekind[e] == K_MDATA) e = ec0[e];
+        else if (ekind[e] == K_APP) { e = ec0[e]; n++; }
+        else break;
+    }
+    if (nargs) *nargs = n;
+    return ekind[e] == K_CONST ? ec0[e] : 0;
+}
 
 static void walk(uint32_t r, vec32 *consts, vec32 *projs)
 {
@@ -259,13 +291,14 @@ static void walk(uint32_t r, vec32 *consts, vec32 *projs)
         uint32_t e = stack.v[--stack.n];
         if (seen[e] == epoch) continue;
         seen[e] = epoch;
+        walked++;
         switch (ekind[e]) {
-        case K_APP: case K_BIND: vpush(&stack, ec0[e]); vpush(&stack, ec1[e]); break;
+        case K_APP: case K_BIND: case K_LAM: vpush(&stack, ec0[e]); vpush(&stack, ec1[e]); break;
         case K_LET: vpush(&stack, ec0[e]); vpush(&stack, ec1[e]); vpush(&stack, let_value(e)); break;
         case K_MDATA: vpush(&stack, ec0[e]); break;
         case K_PROJ: vpush(&stack, ec0[e]); if (projs) vpush(projs, ec1[e]); break;
         case K_CONST: vpush(consts, ec0[e]); break;
-        case K_LEAF: break;
+        case K_LEAF: case K_PROP: break;
         default: fprintf(stderr, "expr %u undefined\n", e); exit(5);
         }
     }
@@ -334,7 +367,9 @@ int main(int argc, char **argv)
     FILE *fe = fopen(path, "w");
     snprintf(path, sizeof path, "%s/projs.tsv", out);
     FILE *fp = fopen(path, "w");
-    if (!fc || !fe || !fp) { perror("fopen"); return 1; }
+    snprintf(path, sizeof path, "%s/sizes.tsv", out);
+    FILE *fz = fopen(path, "w");
+    if (!fc || !fe || !fp || !fz) { perror("fopen"); return 1; }
 
     /* direct dependencies per declaration in the closure */
     uint32_t *lastdep = calloc(ncap, sizeof(uint32_t));
@@ -347,7 +382,22 @@ int main(int argc, char **argv)
         epoch++;
         if (epoch == 0) { memset(seen, 0, emax * 4); epoch = 1; }
         consts.n = 0; projs.n = 0;
-        for (uint32_t i = 0; i < d->rn; i++) walk(roots.v[d->r0 + i], &consts, &projs);
+        uint64_t tsize = 0, vsize = 0;
+        for (uint32_t i = 0; i < d->rn; i++) {
+            walked = 0;
+            walk(roots.v[d->r0 + i], &consts, &projs);
+            if (i == 0) tsize = walked; else vsize += walked;
+        }
+        if (d->kind == 6) {
+            fprintf(fz, "%u\t%llu\t%llu\t0\t0\t0\t0\n", d->name, (unsigned long long)tsize, (unsigned long long)vsize);
+        } else {
+            uint32_t t = roots.v[d->r0];
+            int isprop = ekind[strip(t, 0, 1)] == K_PROP;
+            uint32_t th = head_const(strip(t, 0, 1), NULL), vh = 0, va = 0;
+            if (d->rn > 1) vh = head_const(strip(roots.v[d->r0 + 1], 1, 0), &va);
+            fprintf(fz, "%u\t%llu\t%llu\t%d\t%u\t%u\t%u\n", d->name, (unsigned long long)tsize,
+                    (unsigned long long)vsize, isprop, th, vh, va);
+        }
         for (size_t j = 0; j < consts.n; j++) {
             uint32_t nm = consts.v[j];
             if (lastdep[nm] == di) continue;
@@ -360,7 +410,7 @@ int main(int argc, char **argv)
             nproj++;
         }
     }
-    fclose(fc); fclose(fe); fclose(fp);
+    fclose(fc); fclose(fe); fclose(fp); fclose(fz);
 
     /* names: every declared name, plus referenced ones */
     snprintf(path, sizeof path, "%s/names.tsv", out);
