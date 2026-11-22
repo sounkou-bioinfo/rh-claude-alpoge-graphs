@@ -1,0 +1,127 @@
+---
+title: "Step 6: the chain of input structures, and a census of the proof"
+subtitle: "Continuation of the semantic trace"
+date: 2026-11-22
+format:
+  gfm:
+    output-file: step6-inputs-chain.md
+execute:
+  echo: false
+  warning: false
+---
+
+[Back to step 5](step5-record.md) · [Back to the README](../README.md)
+
+```{r}
+read_tsv <- function(file) utils::read.delim(file.path("..", "results", file), quote = "", stringsAsFactors = FALSE)
+census <- read_tsv("census.tsv")
+largest <- read_tsv("largest_theorems.tsv")
+val <- function(q) census$value[census$quantity == q]
+num <- function(q) format(as.numeric(val(q)), big.mark = ",")
+```
+
+[Step 5](step5-record.md) reduced the bound with the strength of the Riemann Hypothesis to
+a loss bound and a gain bound. These are proved in `linkCore` from hypotheses on a family
+`FamP`. This step follows the gain bound down with the dependency graph. It then measures
+the whole proof to show where its mass is. Paths are relative to `src/` at `40e56bab`.
+
+## Method
+
+Each step down is found with one query on the graph: which declarations in the cone of
+`riemannHypothesis` use a given predicate, or which ones call a structure's constructor
+`.mk`. The source is then read at that declaration. The graph queries use recursive SQL in
+DuckDB. The DuckPGQ property-graph extension does not load in the DuckDB version used.
+
+## The gain bound, followed down
+
+The gain bound needs the divisor inequality, the clause of `LinkDIV_at`
+(`Formalism/SharpRestriction/GlobalTheoremInputs.lean`) that reads
+
+$$
+\mu_{\mathrm{dual}} + h(u) - F_o \le \mathrm{MAIN}(u) + \text{small}.
+$$
+
+| Level | Declaration | What it does | The clause comes from |
+|---|---|---|---|
+| 1 | `linkDIV_at_words` | assembles `LinkDIV_at` | `(hW u).2.2`, a field of `WordFacts` |
+| 2 | `wordFacts_of` | proves `WordFacts` by `linarith` | `c3 : μ_C − κ + h_u − F_o ≤ rhs` and `tR : rhs ≤ MAIN + small` |
+| 3 | `wordFacts_of_clauses` | supplies `c3` | clause 3 of `DivClausesR` |
+| 4 | `divClausesR_of` (`Formalism/LocalToGlobal/Divisibility/ConstantGeTwentyEight.lean`) | proves `DivClausesR` | fields of an input structure `I : DivInputsR`: `L3main`, `twisted_third_sum_le`, `boundsMu`, the passage inequality `deQ` |
+| 5 | `DivisionPackageFace.ofOpen` (`Formalism/LocalToGlobal/Divisibility/RecBridgeMkF.lean`) | builds the package | takes `inp : ∀ u, DivInputs0R …` and `H : ∀ u, NumFacts …` **as parameters** |
+| 6 | `DivisionPackageColumns.ofTied` | the only user of `ofOpen` in the cone | not read |
+
+At level 1, the rewrite `rw [hh u, hh u']` and the step `exact h5 u u'` are the lines that
+nomad421's note quotes. They are in the same lemma, but they prove a different clause, the
+comparison of $h$ between two words. The divisor inequality comes from `WordFacts`.
+
+Each level that was read has the same form. The theorem takes a structure of input
+inequalities and combines the inequalities by `linarith`, `nlinarith` or rewriting. The
+numerical content is in the structure's fields. Those fields arrive as parameters from the
+level above. The proofs at these levels are correct and short. They do not create the
+estimate. In this part of the proof, the estimate is a field of a structure that is passed
+upward until a construction supplies it. The construction has not been reached.
+
+`RecNums` (`Formalism/LocalToGlobal/Divisibility/Inputs.lean`) shows the form of these
+records. It has about 40 real-valued fields and two inequality fields:
+
+```lean
+weight_height_sum_le : ∀ j ρ, (∑ i, ph (ν j ρ i)) - logH j ρ ≤ (if ρ ∈ TT then ph (aT ρ) else 0) + eE j ρ
+weight_sum_eq : ∀ j ρ, (∑ i, ν j ρ i) = (if ρ ∈ TT then aT ρ else 0) + k * w j ρ + δ j ρ
+```
+
+`rhs` is a closed expression in these fields. `tR` asks that it is at most
+$\mathrm{MAIN}(u)$ plus small terms, so that the record matches the arithmetic.
+
+## Census of the proof
+
+```{r}
+knitr::kable(data.frame(Quantity = census$quantity,
+  Value = ifelse(grepl("%", census$value), census$value, format(as.numeric(census$value), big.mark = ","))),
+  row.names = FALSE)
+```
+
+The proof has `r num("project theorems in the cone")` project theorems, with
+`r num("their proof-term nodes")` proof-term nodes. These counts show where the content can
+be:
+
+- **Arithmetic is rare.** `r num("theorems using an analytic Mathlib notion directly")`
+  theorems (3%) use any analytic notion from Mathlib directly: von Mangoldt, L-series, zeta,
+  derivatives, integrals, limits, summability. `r num("theorems using L-functions or zeta directly")`
+  use L-functions or zeta. `r num("theorems using the prime sum ASK directly")` use the prime
+  sum `ASK` directly. The rest work on the project's own structures: lattices, frames,
+  records and families.
+- **The mass is spread.** The 10,000 largest theorems hold
+  `r val("share of theorem mass in the 10,000 largest theorems")` of the theorem mass. No
+  single theorem or small group of theorems holds the proof.
+- **The largest theorems are transport.** They carry a structure across an identification
+  of two copies of the data. They work by case analysis and `subst`, and they do no
+  analysis.
+
+```{r}
+knitr::kable(data.frame(Theorem = paste0("`", sub("^.*\\.", "", largest$name), "`"),
+  Namespace = paste0("`", sub("\\.[^.]+$", "", largest$name), "`"),
+  `Proof-term nodes` = format(largest$value_nodes, big.mark = ","), check.names = FALSE), row.names = FALSE)
+```
+
+For example, `lam_copy`
+(`Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/LamCopy.lean`) states that a
+`Lam` witness for a frame on `D` gives one for the same frame on a copy `D'`. Its proof
+destructs both records and substitutes the equal fields. The term is large because the
+records are large, not because the statement is deep.
+
+## What this shows, and what it does not
+
+The proof is built as a long chain of input structures. The statement with the strength of
+the Riemann Hypothesis enters as fields of such structures, and each layer passes it upward.
+Reading layer by layer does not reach the place where a field is proved from arithmetic.
+The arithmetic objects themselves appear in only a few percent of the theorems.
+
+This is the shape of an argument whose essential inequalities are supplied by the
+construction of the top-level family (`FamP`, through the supply of `TopG` and the bundle
+`HypsAlt`), and not proved where they are used. It is not evidence of an error. A sound
+kernel checked that every field is supplied. It does mean that the place where the
+Riemann Hypothesis strength is established is the construction of these structures. That
+construction is 60% of the proof term and is spread over hundreds of thousands of
+theorems. The next query is: for the fields `L3main`, `twisted_third_sum_le` and
+`weight_height_sum_le`, which declarations construct the values that fill them, and what
+those declarations use from Mathlib.

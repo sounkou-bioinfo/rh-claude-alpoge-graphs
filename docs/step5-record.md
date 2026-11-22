@@ -162,6 +162,9 @@ None of the declarations read here depends on Nielsen’s four witnesses
 
 ## Next
 
+Continued in [step 6](step6-inputs-chain.md), which follows the gain
+bound.
+
 1.  `LinkG_at` and its supply, which is the source of the loss bound:
     `linkG_without_kernels`, `linkG_fam_noKer`, `placesF_min'`.
 2.  `LinkDIV` and `FrameF`, which are the source of the gain bound.
