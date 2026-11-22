@@ -42,11 +42,11 @@ the rest of the proof contains is the open question.
 Take a lemma that is uniform in the geometry parameter $\Gamma$ and
 whose conclusion $C$ does not mention $\Gamma$:
 
-$$L \;:\; \forall\, \Gamma : \mathrm{GeoP},\;\; H(\Gamma) \;\to\; \mathrm{GeoCl}\,\Gamma \;\to\; C .$$
+$$L : \forall \Gamma : \mathrm{GeoP}, \quad H(\Gamma) \to \mathrm{GeoCl}\ \Gamma \to C$$
 
 Instantiate it at the constant predicate
-$\Gamma^{\top} := \lambda\,D\,J\,X.\;\top$, which is `anyGeometry`. The
-certificate $\mathrm{GeoCl}\,\Gamma^{\top}$ is then free, and $L$ proves
+$\Gamma^{\top} := \lambda D J X. \top$, which is `anyGeometry`. The
+certificate $\mathrm{GeoCl}(\Gamma^{\top})$ is then free, and $L$ proves
 $C$ from $H(\Gamma^{\top})$ alone. The certificate carries information
 to $C$ only if some step *eliminates* it: a recursor on
 $\mathrm{GeoCl}$, a projection of its field, or a lemma such as

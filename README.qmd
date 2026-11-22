@@ -73,11 +73,11 @@ Take a lemma that is uniform in the geometry parameter $\Gamma$ and whose conclu
 not mention $\Gamma$:
 
 $$
-L \;:\; \forall\, \Gamma : \mathrm{GeoP},\;\; H(\Gamma) \;\to\; \mathrm{GeoCl}\,\Gamma \;\to\; C .
+L : \forall \Gamma : \mathrm{GeoP}, \quad H(\Gamma) \to \mathrm{GeoCl}\ \Gamma \to C
 $$
 
-Instantiate it at the constant predicate $\Gamma^{\top} := \lambda\,D\,J\,X.\;\top$, which is
-`anyGeometry`. The certificate $\mathrm{GeoCl}\,\Gamma^{\top}$ is then free, and $L$ proves $C$
+Instantiate it at the constant predicate $\Gamma^{\top} := \lambda D J X. \top$, which is
+`anyGeometry`. The certificate $\mathrm{GeoCl}(\Gamma^{\top})$ is then free, and $L$ proves $C$
 from $H(\Gamma^{\top})$ alone. The certificate carries
 information to $C$ only if some step *eliminates* it: a recursor on $\mathrm{GeoCl}$, a
 projection of its field, or a lemma such as `geoOf_surf` that extracts a surface from it. If
@@ -101,7 +101,7 @@ font[root] <- "white"
 dot <- c(
   "digraph G {",
   "  rankdir=TB; nodesep=0.12; ranksep=0.22; bgcolor=\"white\";",
-  "  node [shape=box, style=\"rounded,filled\", fontname=\"Helvetica\", fontsize=9, height=0.22, margin=\"0.06,0.02\", penwidth=0.6];",
+  "  node [shape=box, style=\"rounded,filled\", fontname=\"Helvetica\", fontsize=11, height=0.22, margin=\"0.06,0.02\", penwidth=0.6];",
   "  edge [arrowsize=0.45, penwidth=0.5, color=\"#555555\"];",
   sprintf("  n%s [label=\"%s\", fillcolor=\"%s\", fontcolor=\"%s\"];", nodes$id, nodes$short, fill, font),
   sprintf("  n%s -> n%s;", edges$src, edges$dst),

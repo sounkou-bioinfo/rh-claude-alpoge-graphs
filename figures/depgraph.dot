@@ -1,6 +1,6 @@
 digraph G {
   rankdir=TB; nodesep=0.12; ranksep=0.22; bgcolor="white";
-  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=9, height=0.22, margin="0.06,0.02", penwidth=0.6];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, height=0.22, margin="0.06,0.02", penwidth=0.6];
   edge [arrowsize=0.45, penwidth=0.5, color="#555555"];
   n550010 [label="RecTExists", fillcolor="#b7e4c7", fontcolor="black"];
   n551631 [label="VWin", fillcolor="#b7e4c7", fontcolor="black"];
