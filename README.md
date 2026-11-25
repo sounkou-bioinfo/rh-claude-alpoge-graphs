@@ -263,8 +263,15 @@ form of an Arakelov-type argument: the prime sum is at most the total
 local gain, and the total gain is bounded by the slope of a lattice
 built from local data. Both ends are proved statements with no vacuous
 dependency. The link between them, how the lattices are built from the
-local gains, is where a reader should judge the argument. It has not
-been read.
+local gains, is where a reader should judge the argument.
+[`docs/step9-lattice-link.md`](docs/step9-lattice-link.md) reads it,
+with a first pass by a separate Claude Fable 5.2 agent whose report is
+kept in `docs/agent/`. The gain is put into the lattice by definition:
+the lattice is twisted by an ideal whose exponents are the local gains,
+and the tie is proved by `rfl`. The bound on the gain must then come
+from the twisted lattice still pairing integrally into a second lattice
+with bounded height. Those integrality and height statements are passed
+in as parameters, and their proofs have not been read.
 
 ## Assessment
 
@@ -361,7 +368,7 @@ cd .. && quarto render README.qmd
 | `sql/` | Load script, the queries behind each result, and the export of `results/` |
 | `results/` | The result tables that this document reads |
 | `figures/` | The graph, generated when this document is rendered |
-| `docs/` | Longer documents linked from this README: `semantic-trace.qmd` reads the endgame in the source, `step5-record.qmd`, `step6-inputs-chain.qmd`, `step7-gain-bottom.qmd` and `step8-loss-side.qmd` continue it |
+| `docs/` | Longer documents linked from this README: `semantic-trace.qmd` reads the endgame in the source, `step5-record.qmd`, `step6-inputs-chain.qmd`, `step7-gain-bottom.qmd`, `step8-loss-side.qmd` and `step9-lattice-link.qmd` continue it; `agent/` keeps the report of a separate reading agent |
 
 Nielsen’s paper is not redistributed. The export and the full graph
 tables (about 5 GB) are not included. They can be rebuilt with the

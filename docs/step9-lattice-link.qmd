@@ -1,0 +1,134 @@
+---
+title: "Step 9: the link between the local gains and the lattice"
+subtitle: "Continuation of the semantic trace"
+date: 2026-11-25
+format:
+  gfm:
+    output-file: step9-lattice-link.md
+---
+
+[Back to step 8](step8-loss-side.md) · [Back to the README](../README.md)
+
+[Step 8](step8-loss-side.md) found that the argument has an Arakelov-type form. The prime
+sum is at most the total local gain. The total local gain is bounded through the slope of a
+lattice. This step reads the link between the two: how the lattices are built, and how the
+gain enters them.
+
+The first reading was done by a separate agent, Claude Fable 5.2 in Pi, with the brief in
+[`agent/fable-lattice-task.md`](agent/fable-lattice-task.md). Its report and notes are in
+[`agent/fable-lattice-report.md`](agent/fable-lattice-report.md) and
+[`agent/fable-lattice-notes.md`](agent/fable-lattice-notes.md). The claims used below were
+checked against the source and the graph by the main session. Paths are relative to `src/`
+at `40e56bab`.
+
+## Summary
+
+- **The gain is put into the lattice by construction.** The lattice `Nu u` is defined as a
+  lattice `NuLat u` twisted by an ideal whose exponents are the local gains. The
+  statement that ties the two, `NprimeDef`, is proved by `rfl`. So "slope of `Nu` equals
+  slope of `NuLat` plus gain terms" is the degree formula for an ideal twist. It has no
+  arithmetic content of its own.
+- **The content is in four other statements:**
+  1. the local lattices `NP` and their index bound by `tau + io`;
+  2. a divisibility `val2`: the pairing has valuation at least the twist exponent `sg`;
+  3. a height bound for the pairing;
+  4. `slope_bounds` for the lattice `RR`, with the ties `hRR`, `hNu`, `shift` and `foTie`.
+
+  These say that the twisted lattice still pairs integrally into `RR`, with bounded
+  height. That is where a gain larger than the arithmetic allows would fail.
+- **A toy record with zero lattices is in the proof.** Only its local fields are used.
+  Its lattices are not.
+- **Items 2 to 4 enter through the structure `DivisionPackageFace`.** Its only builder,
+  `ofOpen`, takes them as parameters. Where they are finally proved has not been read.
+
+## The gain is twisted into the lattice
+
+The definitions, checked in the source:
+
+```lean
+-- Formalism/LocalRingCardinality/DataParams₂.lean:215, 220
+def sg (u : D.what₂.Word) (w : D.what₂.places.Pl) : ℝ :=
+  ∑ j ∈ lifts D, (L.gainD j w + L.F j w - L.E u j w)
+def Ga : ℝ := ∑ w ∈ L.supp, sz w ((∑ j ∈ lifts D, L.gainD j w) - L.tau w)
+
+-- Formalism/LocalRingCardinality/DataDIVDefs.lean:17, 22
+def Iu (D : D7) (L : SizeData₂ D) (u : D.what₂.Word) : FractionalIdeal … :=
+  ∏ w ∈ L.supp, (D.plEq w).asIdeal ^ (-(⌊ur D w (L.sg u w)⌋))
+def NprimeDef (D : D7) (L : SizeData₂ D) : Prop :=
+  ∀ u, (D.div.Nu u).L = Submodule.span (𝓞 D.what₂.LL) {x | ∃ a ∈ Iu D L u, ∃ y ∈ L.NuLat u, x = a • y}
+
+-- Development/AbelianVarietyTheory/Definitions/GlobalTwisting/SetUnipotentTranslate.lean:381-400
+def pt : Pt C where
+  D := setDiv D (nPrime p.L) p.ht        -- replaces Nu u by the twisted lattice, and h by hExpl6
+  …
+      nprimeDef := fun _ => rfl
+      h_eq := fun _ => rfl
+```
+
+$$
+\mathrm{Nu}(u) = \Big( \prod_{w} \mathfrak{p}_w^{-\lfloor e_w \, \mathrm{sg}(u, w) \rfloor} \Big) \cdot \mathrm{NuLat}(u),
+\qquad
+\mathrm{sg}(u, w) = \sum_j \left( \mathrm{gain}_j(w) + F_j(w) - E_{u,j}(w) \right).
+$$
+
+Twisting a lattice by $\mathfrak{p}^{-k}$ raises its degree by $k \log N\mathfrak{p}$. So the
+slope of `Nu u` exceeds the slope of `NuLat u` by the weighted total gain, by definition.
+This is the third identity of this kind on the path. The first two are the height equation
+`hExpl6` (`h_eq := rfl`, the same structure as here) and the level-three scale
+`ClosedScale3` (step 7).
+
+## Where the content is
+
+An identity cannot bound the gain. The bound must come from a statement that limits how far
+`Nu u` can be twisted. The report finds four such statements and reads where they enter:
+
+| Statement | What it constrains | Status |
+|---|---|---|
+| `NP` and `LatticeLengthsAtPlace` (`hG1`) | the local lattice at a gain place. Its index in `MramL` is at most `tau + io` | definitions and entry read. Proofs not read |
+| `val2` (from `val2AllAtRF`) | the pairing of `Nu u` into `RR` has valuation at least $\lfloor e_w\,\mathrm{sg}(u,w) \rfloor$ at each place | entry read. Proof not read |
+| `HBound` clause of `LinkDIV_at`, `hTie` | the height of the pairing is bounded | entry read. Proof not read |
+| `slope_bounds` / `BoundsMu` for `RR` | the dual slope of `RR` | statement read (step 7). Proof not read |
+
+Read together, they say this. The lattice twisted by the gain still maps integrally into
+`RR` with bounded height. The slope of `RR` is bounded by the geometry of numbers. So the
+twist, and with it the total gain, cannot be too large. If the argument is correct, the
+arithmetic of the primes is in `val2`, the integrality of the pairing at the gain places. A
+gain that the arithmetic does not support would break integrality there.
+
+## The toy record
+
+`exampleRecordOfData`
+(`Formalism/LocalRingCardinality/SpanPowerMembership/ExampleClassGroupCardPos.lean:82`)
+builds a record `D7` with `div := toyZeroLatticeDatum H.E`. Its lattices are zero. The
+graph shows that it reaches the main theorem by one path:
+
+```text
+riemannHypothesis → … → nonempty_hyps_definite_side_of_closed_bound → …
+  → WachPlace.wach_lattices → exists_positions_global → MemLoc.record_nonempty
+  → record_nonempty_of_localGap → nonempty_D7_of_localGap → exampleRecord
+```
+
+`exists_positions_global`
+(`Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsSlotsGlobal.lean:257`)
+obtains `D` from `record_nonempty`. It uses only `D.loc`, `D.locA` and `D.locT`. In the toy
+record these fields are `G.nloc`, `G.nlocA` and `G.nlocT`, the local data of a `LocalGap`.
+The zero lattices are never read on this path. This is the same pattern as `anyGeometry`: a
+degenerate object fills a slot, and only fields that carry real data are used.
+
+Whether the record that seeds the family `FamP` is this toy record or a real one, built by
+`exists_divStage`, has not been settled. The family's lattices `Nu u` keep the vector space
+of their seed record (`setDiv` changes only `L` and `h`). If the seed were the toy, every
+rank would be zero, and `Lat_at` (`QuadraticLogDerivCongr.lean:185`) requires
+`rank > 0`. A rank-zero seed would therefore fail a stated condition. It would not pass
+silently.
+
+## What is still open
+
+1. `DivisionPackageFace.ofOpen` and `DivisionPackageColumns.ofTied`: how `val2`, the height
+   bound and the ties are discharged. This is the main gap.
+2. `val2AllAtRF`: the proof of integrality at the gain places. This is where the
+   arithmetic must enter.
+3. The proof of `slope_bounds`.
+4. Which record seeds the family `FamP`.
+
+The full list of ten open points is in the agent report.

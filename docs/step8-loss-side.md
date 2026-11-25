@@ -124,3 +124,6 @@ one statement this report has not seen proved. It is the link between
 the two sides: the construction of the lattices `Nu`, `XE`, `Xc` from
 the local data. It is the place to read next. A competent human reader
 would judge the whole argument there.
+
+Continued in [step 9](step9-lattice-link.md), which reads the link
+between the two sides.
